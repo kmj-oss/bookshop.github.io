@@ -1,2 +1,335 @@
 # bookshop.github.io
 bookshop.github.io
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 민음사 동네서점 가이드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --m-brown: #4a3933; 
+            --m-khaki: #8b8a6b;
+            --m-beige: #f4f1ea; 
+            --m-blue: #4a90e2;
+            --m-text: #1a1a1a;
+            --transition: all 0.6s cubic-bezier(0.215, 0.61, 0.355, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans KR', sans-serif; color: var(--m-text); background-color: #fff; line-height: 1.6; word-break: keep-all; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+
+        /* [유지] 애니메이션 효과 클래스 */
+        .reveal { opacity: 0; transform: translateY(40px); transition: var(--transition); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* [수정] 전국 서점 이미지가 제목 주변에 박히는 히어로 배너 */
+        .hero {
+            width: 100%; height: 100vh; 
+            background-color: var(--m-beige); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px; position: relative; overflow: hidden;
+        }
+        .hero-content {
+            z-index: 10; transition: transform 0.1s ease-out; /* 스크롤 연동용 */
+            position: relative; padding: 20px;
+        }
+        .hero .sub-title { color: #888; font-size: 1.1rem; margin-bottom: 20px; font-weight: 500; letter-spacing: 2px; }
+        .hero h1 { font-size: 3.5rem; font-weight: 900; color: var(--m-brown); line-height: 1.3; }
+
+        /* [추가] 제목 주변에 콕콕 박히는 이미지 스타일 */
+        .floating-img {
+            position: absolute; width: 150px; height: auto; z-index: 1; opacity: 0.8;
+            transition: all 0.5s ease-out; /* 스크롤 패럴랙스 */
+        }
+        .hero:hover .floating-img { width: 160px; } /* 호버 시 약간 확대 */
+
+        /* [수정] 10개 지역 서점 배치 구도 (제목 주변 콕콕) */
+        /* 위쪽 */
+        .gwangwon   { top: 5%;  left: 30%; transform: rotate(-5deg);  }
+        .seoul     { top: 10%; right: 35%; transform: rotate(5deg);   }
+        .gyeonggi   { top: 20%; left: 15%; transform: rotate(-10deg); }
+        .daejeon    { top: 25%; right: 15%; transform: rotate(10deg);  }
+
+        /* 중앙 (제목 양 옆) */
+        .jeonnam    { top: 40%; right: 5%;  transform: rotate(3deg);  }
+        
+        /* 아래쪽 */
+        .daegu      { bottom: 25%; left: 15%; transform: rotate(10deg); }
+        .ulsan      { bottom: 30%; right: 20%; transform: rotate(-10deg); }
+        .gyeongbuk  { bottom: 10%; left: 35%; transform: rotate(-5deg); }
+        .busan      { bottom: 5%; right: 30%; transform: rotate(5deg); }
+        .gyeongnam  { bottom: 15%; right: 10%; transform: rotate(8deg); }
+
+
+        .intro-text {
+            max-width: 800px; margin: 100px auto 40px; text-align: center;
+            font-size: 1rem; color: #666; line-height: 1.8; padding: 0 20px;
+        }
+
+        /* [유지] 내비게이션 (입금안내 포함) */
+        .step-nav {
+            display: flex; justify-content: center; gap: 30px; padding: 20px;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100;
+        }
+        .nav-item { display: flex; align-items: center; gap: 8px; font-weight: 700; color: #555; transition: 0.3s; }
+        .nav-item:hover { color: var(--m-blue); transform: translateY(-2px); }
+        .nav-num { 
+            background: var(--m-blue); color: #fff; width: 24px; height: 24px; 
+            display: flex; align-items: center; justify-content: center; border-radius: 4px; font-size: 13px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+
+        /* 가이드 카드 (이미지 영역 삭제 버전) */
+        .step-card {
+            padding: 50px; background: #fff; border: 1px solid #eee;
+            border-radius: 20px; margin-bottom: 60px; transition: var(--transition);
+            scroll-margin-top: 100px;
+        }
+        .step-card:hover { box-shadow: 0 30px 60px rgba(0,0,0,0.08); border-color: var(--m-khaki); }
+        .step-info { width: 100%; }
+
+        .step-label { color: var(--m-blue); font-weight: 900; font-size: 1.1rem; margin-bottom: 10px; display: block; }
+        .step-title { font-size: 2rem; font-weight: 900; margin-bottom: 25px; color: var(--m-brown); }
+
+        .info-list { list-style: none; }
+        .info-list li { margin-bottom: 14px; padding-left: 20px; position: relative; color: #444; }
+        .info-list li::before { content: '•'; position: absolute; left: 0; color: var(--m-khaki); font-weight: bold; }
+        
+        .rate-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; border: 1px solid #eee; }
+        .rate-table td { padding: 14px; border-bottom: 1px solid #eee; font-size: 1rem; }
+        .rate-table tr:last-child td { border-bottom: none; }
+        .rate-table td:first-child { font-weight: 700; color: var(--m-brown); }
+        .rate-table td:last-child { text-align: right; color: var(--m-blue); font-weight: 900; }
+
+        .policy-note { background: #fdfaf4; padding: 20px; border-radius: 10px; margin-top: 25px; border-left: 5px solid var(--m-khaki); }
+        .policy-note p { font-size: 0.95rem; font-weight: 700; color: var(--m-brown); }
+
+        .form-box { background: #f8f9fa; padding: 25px; border-radius: 12px; margin-top: 25px; border: 1px solid #eee; }
+        .form-title { font-weight: 700; margin-bottom: 15px; display: block; color: var(--m-brown); }
+
+        .btn {
+            display: inline-block; background: var(--m-brown); color: #fff !important;
+            padding: 16px 40px; border-radius: 8px; font-weight: 700; margin-top: 30px; transition: 0.3s;
+        }
+        .btn:hover { background: #352924; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(74, 57, 51, 0.2); }
+
+        /* 입금 안내 (STEP 04) */
+        .bank-section {
+            background-color: var(--m-brown); color: #fff; padding: 80px 40px;
+            text-align: center; border-radius: 20px; margin: 60px 0; scroll-margin-top: 100px;
+        }
+        .bank-section h2 { font-size: 2.2rem; font-weight: 900; margin-bottom: 30px; }
+        .bank-account {
+            display: inline-block; border: 1px solid rgba(255,255,255,0.3);
+            padding: 25px 50px; font-size: 1.8rem; font-weight: 700;
+            margin-bottom: 40px; background: rgba(255,255,255,0.05); border-radius: 10px;
+        }
+        .bank-grid {
+            max-width: 950px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; text-align: left;
+        }
+        .bank-item { background: rgba(255,255,255,0.1); padding: 25px; border-radius: 12px; }
+        .bank-item strong { display: block; color: var(--m-khaki); margin-bottom: 10px; font-size: 1.1rem; }
+
+        .etc-section { 
+            background: #fff4f4; padding: 50px; border-radius: 20px; margin-top: 60px; border: 1px solid #ffebeb; 
+        }
+        .etc-section h2 { font-size: 1.8rem; color: #b02a37; font-weight: 900; margin-bottom: 20px; } 
+        .brand-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 25px; }
+        .brand-tag { background: #fff; padding: 12px; text-align: center; border-radius: 8px; border: 1px solid #f8d7da; color: #b02a37; font-weight: 700; }
+
+        footer { padding: 100px 20px; text-align: center; border-top: 1px solid #eee; background: #fafafa; }
+        .contact { font-size: 1.1rem; color: #444; line-height: 2; }
+
+        @media (max-width: 1024px) {
+            .floating-img { width: 100px; opacity: 0.6; }
+            .hero h1 { font-size: 2.5rem; }
+        }
+
+        @media (max-width: 768px) {
+            .step-card { flex-direction: column; padding: 30px; }
+            .bank-account { font-size: 1.2rem; padding: 15px; width: 100%; }
+            .step-nav { display: none; }
+            /* 모바일에서는 메인 제목 가리지 않게 숨기기 */
+            .floating-img { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <section class="hero">
+        <img src="2_2_동네서점_강원.png" class="floating-img gwangwon" alt="강원 서점" id="img1">
+        <img src="2_2_동네서점_서울.png" class="floating-img seoul" alt="서울 서점" id="img2">
+        <img src="2_2_동네서점_경기.png" class="floating-img gyeonggi" alt="경기 서점" id="img3">
+        <img src="2_2_동네서점_대전.png" class="floating-img daejeon" alt="대전 서점" id="img4">
+        
+        <img src="2_2_동네서점_전남.png" class="floating-img jeonnam" alt="전남 서점" id="img6">
+        
+        <img src="2_2_동네서점_대구.png" class="floating-img daegu" alt="대구 서점" id="img7">
+        <img src="2_2_동네서점_부산.png" class="floating-img busan" alt="부산 서점" id="img8">
+        <img src="2_2_동네서점_경북.png" class="floating-img gyeongbuk" alt="경북 서점" id="img9">
+        <img src="2_2_동네서점_경남.png" class="floating-img gyeongnam" alt="경남 서점" id="img10">
+
+        <div class="hero-content" id="heroContent">
+            <div class="sub-title">2026 MINUMSA PARTNERSHIP</div>
+            <h1>읽는 즐거움,<br>동네서점과 함께</h1>
+        </div>
+    </section>
+
+    <div class="intro-text reveal">
+        민음사는 동네서점 파트너 페이지를 통해 거래처 등록 · 주문 · 이벤트 안내를 진행하고 있습니다.<br>
+        이용 중 불편한 점이나 개선 사항이 있다면 언제든 편하게 연락 주세요.<br>
+        민음사 도서에 관심 가져주셔서 진심으로 감사합니다 👩🏻
+    </div>
+
+    <nav class="step-nav">
+        <a href="#step1" class="nav-item"><span class="nav-num">1</span> 서점 거래처 등록</a>
+        <a href="#step2" class="nav-item"><span class="nav-num">2</span> 주문 및 공급률</a>
+        <a href="#step3" class="nav-item"><span class="nav-num">3</span> 배송 및 교환</a>
+        <a href="#bank" class="nav-item"><span class="nav-num">4</span> 입금 안내</a>
+    </nav>
+
+    <div class="container">
+        <div class="step-card reveal" id="step1">
+            <div class="step-info">
+                <span class="step-label">STEP 01</span>
+                <h2 class="step-title">서점 파트너 등록</h2>
+                <ul class="info-list">
+                    <li><strong>경로:</strong> 동네서점 Event & ORDER → 서점거래처 등록</li>
+                    <li><strong>준비물:</strong> 사업자등록증 파일 필수 (jpg, png, gif)</li>
+                    <li style="color: #666; font-size: 0.9rem; padding-left: 0;">&nbsp;&nbsp;&nbsp;&nbsp;(로그인 후 페이지 확인 가능)</li>
+                    <li><strong>권장 브라우저:</strong> 크롬 또는 네이버 브라우저 (아이폰 사파리 오류 시)</li>
+                </ul>
+                <a href="https://minumsa.minumsa.com/lc-event/" target="_blank" class="btn">파트너 등록 바로가기</a>
+            </div>
+        </div>
+
+        <div class="step-card reveal" id="step2">
+            <div class="step-info">
+                <span class="step-label">STEP 02</span>
+                <h2 class="step-title">도서 주문 및 공급률</h2>
+                <ul class="info-list">
+                    <li>최소 수량 제한은 없으나 3부 이상 주문을 권장합니다.</li>
+                    <li><strong>품절/절판 도서가 주문에 포함되어 있을 경우 주문서에 별도 표기 드립니다.<br>(주문 페이지에서 확인 가능)</strong></li>
+                </ul>
+                <table class="rate-table">
+                    <tr><td>기본 도서 공급률</td><td>65%</td></tr>
+                    <tr><td>재정가 세트도서</td><td>75%</td></tr>
+                    <tr><td>잡지(릿터/크릿터)</td><td>70%</td></tr>
+                </table>
+                <div class="policy-note">
+                    <p>✔️ 출고율은 기본 65%, 현매로 진행됩니다.</p>
+                    <p>✔️ 파본 등 도서에 문제가 있는 경우를 제외하고는 반품이 불가능합니다.</p>
+                </div>
+                <a href="https://minumsa.minumsa.com/lc-event/lc-order/?mode=order" target="_blank" class="btn">주문하기 바로가기</a>
+            </div>
+        </div>
+
+        <div class="step-card reveal" id="step3">
+            <div class="step-info">
+                <span class="step-label">STEP 03</span>
+                <h2 class="step-title">배송 및 파본 교환</h2>
+                <ul class="info-list">
+                    <li><strong>발송:</strong> 입금 확인 후 익일 발송 (영업일 기준)</li>
+                    <li><strong>택배:</strong> 롯데택배 (파주 출고 / <b>배송비 민음사 부담</b>)</li>
+                    <li>급한 주문은 비고 기재 또는 메일로 별도 연락 주세요.</li>
+                </ul>
+                <div class="form-box">
+                    <span class="form-title">⚠️ 파본 교환 메일 양식 (kmj@minumsa.com)</span>
+                    <p style="font-size: 0.95rem; color: #555;">☑ 파본 도서명 / 수량 / 주문 일자</p>
+                </div>
+            </div>
+        </div>
+
+        <section class="bank-section reveal" id="bank">
+            <h2>입금 및 계산서 안내</h2>
+            <div class="bank-account">하나은행 139-910023-18004 (주)민음사</div>
+            <div class="bank-grid">
+                <div class="bank-item">
+                    <strong>선입금 원칙</strong>
+                    <p>도서 대금은 주문 접수와 동시에 입금해 주세요. 미입금 시 출고되지 않습니다.</p>
+                </div>
+                <div class="bank-item">
+                    <strong>정확한 입금자명</strong>
+                    <p>반드시 <b>'서점명'</b>으로 입금해 주세요. 대표자명 입금 시 확인 지연.</p>
+                </div>
+                <div class="bank-item">
+                    <strong>배송 일정</strong>
+                    <p>당일 23:59까지 입금 완료 건에 한해 익일 출고됩니다.</p>
+                </div>
+                <div class="bank-item">
+                    <strong>기타 안내</strong>
+                    <p>공급가 수정 등으로 발생하는 차액은 별도로 안내드립니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <div class="etc-section reveal">
+            <h2>기타</h2>
+            <p style="font-weight: 500;">• 민음사 출판그룹의 다른 브랜드 도서의 주문은 불가합니다.</p>
+            <p style="margin-top: 25px; font-weight: 700; color: #b02a37;">❌ 주문 불가 브랜드</p>
+            <div class="brand-grid">
+                <div class="brand-tag">사이언스북스</div><div class="brand-tag">반비</div>
+                <div class="brand-tag">민음인</div><div class="brand-tag">판미동</div>
+                <div class="brand-tag">비룡소</div><div class="brand-tag">세미콜론</div>
+                <div class="brand-tag">황금가지</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="contact">
+            <strong>동네서점 담당자 : 마케팅부 김민주</strong><br>
+            02-515-2000 (내선 239) | <a href="mailto:kmj@minumsa.com" style="text-decoration: underline;">kmj@minumsa.com</a>
+        </div>
+    </footer>
+
+    <script>
+        // Reveal 애니메이션
+        function reveal() {
+            const reveals = document.querySelectorAll(".reveal");
+            reveals.forEach(el => {
+                const windowHeight = window.innerHeight;
+                const elementTop = el.getBoundingClientRect().top;
+                if (elementTop < windowHeight - 100) {
+                    el.classList.add("active");
+                }
+            });
+        }
+
+        // [수정] 배너 패럴랙스 (제목과 전국 이미지가 각기 다른 속도로 이동)
+        window.addEventListener("scroll", () => {
+            const scrollPos = window.pageYOffset;
+            const heroContent = document.getElementById("heroContent");
+            const floatingImgs = document.querySelectorAll(".floating-img");
+            
+            // 화면 높이 내에서만 애니메이션 작동
+            if (scrollPos < window.innerHeight) {
+                // 메인 제목 이동 (느리게)
+                heroContent.style.transform = `translateY(${scrollPos * 0.4}px)`;
+                heroContent.style.opacity = 1 - (scrollPos / window.innerHeight);
+                
+                // [수정] 전국 이미지들 이동 (각기 다른 속도와 방향으로 둥둥)
+                floatingImgs.forEach((img, index) => {
+                    // index별로 속도 가중치를 달리하여 더 입체감 있게
+                    const speed = (index + 1) * 0.05;
+                    const direction = index % 2 === 0 ? 1 : -1; // 짝수/홀수별 방향 반대
+                    
+                    img.style.transform = `translateY(${scrollPos * speed * direction}px)`;
+                    img.style.opacity = 0.8 - (scrollPos / window.innerHeight); // 서서히 투명화
+                });
+            }
+            reveal();
+        });
+
+        // 초기 실행
+        reveal();
+    </script>
+</body>
+</html>
